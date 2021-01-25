@@ -65,6 +65,11 @@ export class TSWebAPI implements ComponentFramework.StandardControl<IInputs, IOu
 	public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container:HTMLDivElement)
 	{
 		// Add control initialization code
+		this._context = context;
+        this._controlViewRendered = false;
+        this._container = document.createElement("div");
+        this._container.classList.add("TSWebAPI_Container");
+        container.appendChild(this._container);
 	}
 
 
