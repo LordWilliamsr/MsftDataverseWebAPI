@@ -91,8 +91,8 @@ export class TSWebAPI implements ComponentFramework.StandardControl<IInputs, IOu
 
             // Render result div to display output of Web API calls
             this.renderResultsDiv();
+		}	
 	}
-
 	/** 
 	 * It is called by the framework prior to a control receiving new data. 
 	 * @returns an object based on nomenclature defined in manifest, expecting object[s] for property marked as “bound” or “output”
