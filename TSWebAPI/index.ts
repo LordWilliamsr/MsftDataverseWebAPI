@@ -212,5 +212,211 @@ export class TSWebAPI implements ComponentFramework.StandardControl<IInputs, IOu
      */
     private getCreateButtonId(entityNumber: string): string {
         return "create_button_" + entityNumber;
+	}
+	
+
+	// Add the following onClick event handlers to trigger the various CRUD operations:
+	/**
+     * Event Handler for onClick of create record button
+     * @param event : click event
+     */
+    private createButtonOnClickHandler(event: Event): void {
+        // Retrieve the value to set the currency field to from the button's attribute
+        let currencyAttributeValue: Number = parseInt(
+            (event.srcElement! as Element)!.attributes.getNamedItem("buttonvalue")!.value
+        );
+
+        // Generate unique record name by appending timestamp to _requiredAttributeValue
+        let recordName: string = TSWebAPI._requiredAttributeValue + "_" + Date.now();
+
+        // Set the values for the attributes we want to set on the new record
+        // If you want to set additional attributes on the new record, add to data dictionary as key/value pair
+        var data: any = {};
+        data[TSWebAPI._requiredAttributeName] = recordName;
+        data[TSWebAPI._currencyAttributeName] = currencyAttributeValue;
+
+        // store reference to 'this' so it can be used in the callback method
+        var thisRef = this;
+
+        // Invoke the Web API to creat the new record
+        this._context.webAPI.createRecord(TSWebAPI._entityName, data).then
+            (
+                function (response: ComponentFramework.EntityReference) {
+                    // Callback method for successful creation of new record
+
+                    // Get the ID of the new record created
+                    let id: string = response.id.guid;
+
+                    // Generate HTML to inject into the result div to showcase the fields and values of the new record that is created
+                    let resultHtml: string = "Created new " + TSWebAPI._entityName + " record with below values:"
+                    resultHtml += "<br />";
+                    resultHtml += "<br />";
+                    resultHtml += "id: " + id;
+                    resultHtml += "<br />";
+                    resultHtml += "<br />";
+                    resultHtml += TSWebAPI._requiredAttributeName + ": " + recordName;
+                    resultHtml += "<br />";
+                    resultHtml += "<br />";
+                    resultHtml += TSWebAPI._currencyAttributeName + ": " + currencyAttributeValue;
+
+                    thisRef.updateResultContainerText(resultHtml);
+                },
+                function (errorResponse: any) {
+                    // Error handling code here - record failed to be created
+                    thisRef.updateResultContainerTextWithErrorResponse(errorResponse);
+                }
+            );
+    }
+
+    /**
+     * Event Handler for onClick of delete record button
+     * @param event : click event
+     */
+    private deleteButtonOnClickHandler(): void {
+        // Invoke a lookup dialog to allow the user to select an existing record of type _entityName to delete
+        var lookUpOptions: any =
+        {
+            entityTypes: [TSWebAPI._entityName]
+        };
+
+        // store reference to 'this' so it can be used in the callback method
+        var thisRef = this;
+
+        var lookUpPromise: any = this._context.utils.lookupObjects(lookUpOptions);
+
+        lookUpPromise.then
+            (
+                // Callback method - invoked after user has selected an item from the lookup dialog
+                // Data parameter is the item selected in the lookup dialog
+                (data: ComponentFramework.EntityReference[]) => {
+                    if (data && data[0]) {
+                        // Get the ID and entityType of the record that was selected by the lookup
+                        let id: string = data[0].id.guid;
+                        let entityType: string = data[0].etn!;
+
+                        // Invoke the deleteRecord method of the WebAPI to delete the selected record
+                        this._context.webAPI.deleteRecord(entityType, id).then
+                            (
+                                function (response: ComponentFramework.EntityReference) {
+                                    // Record was deleted successfully
+                                    let responseId: string = response.id.guid;
+                                    let responseEntityType: string = response.etn!;
+
+                                    // Generate HTML to inject into the result div to showcase the deleted record 
+                                    thisRef.updateResultContainerText("Deleted " + responseEntityType + " record with ID: " + responseId);
+                                },
+                                function (errorResponse: any) {
+                                    // Error handling code here
+                                    thisRef.updateResultContainerTextWithErrorResponse(errorResponse);
+                                }
+                            );
+                    }
+                },
+                (error: any) => {
+                    // Error handling code here
+                    thisRef.updateResultContainerTextWithErrorResponse(error);
+                }
+            );
+    }
+
+    /**
+     * Event Handler for onClick of calculate average value button
+     * @param event : click event
+     */
+    private calculateAverageButtonOnClickHandler(): void {
+        // Build FetchXML to retrieve the average value of _currencyAttributeName field for all _entityName records
+        // Add a filter to only aggregate on records that have _currencyAttributeName not set to null
+        let fetchXML: string = "<fetch distinct='false' mapping='logical' aggregate='true'>";
+        fetchXML += "<entity name='" + TSWebAPI._entityName + "'>";
+        fetchXML += "<attribute name='" + TSWebAPI._currencyAttributeName + "' aggregate='avg' alias='average_val' />";
+        fetchXML += "<filter>";
+        fetchXML += "<condition attribute='" + TSWebAPI._currencyAttributeName + "' operator='not-null' />";
+        fetchXML += "</filter>";
+        fetchXML += "</entity>";
+        fetchXML += "</fetch>";
+
+        // store reference to 'this' so it can be used in the callback method
+        var thisRef = this;
+
+        // Invoke the Web API RetrieveMultipleRecords method to calculate the aggregate value
+        this._context.webAPI.retrieveMultipleRecords(TSWebAPI._entityName, "?fetchXml=" + fetchXML).then
+            (
+                function (response: ComponentFramework.WebApi.RetrieveMultipleResponse) {
+                    // Retrieve multiple completed successfully -- retrieve the averageValue 
+                    let averageVal: Number = response.entities[0].average_val;
+
+                    // Generate HTML to inject into the result div to showcase the result of the RetrieveMultiple Web API call
+                    let resultHTML: string = "Average value of " + TSWebAPI._currencyAttributeNameFriendlyName + " attribute for all " + TSWebAPI._entityName + " records: " + averageVal;
+                    thisRef.updateResultContainerText(resultHTML);
+                },
+                function (errorResponse: any) {
+                    // Error handling code here
+                    thisRef.updateResultContainerTextWithErrorResponse(errorResponse);
+                }
+            );
+    }
+
+    /**
+     * Event Handler for onClick of calculate record count button
+     * @param event : click event
+     */
+    private refreshRecordCountButtonOnClickHandler(): void {
+        // Generate OData query string to retrieve the _currencyAttributeName field for all _entityName records
+        // Add a filter to only retrieve records with _requiredAttributeName field which contains _requiredAttributeValue
+        let queryString: string = "?$select=" + TSWebAPI._currencyAttributeName + "&$filter=contains(" + TSWebAPI._requiredAttributeName +
+            ",'" + TSWebAPI._requiredAttributeValue + "')";
+
+        // store reference to 'this' so it can be used in the callback method
+        var thisRef = this;
+
+        // Invoke the Web API Retrieve Multiple call
+        this._context.webAPI.retrieveMultipleRecords(TSWebAPI._entityName, queryString).then
+            (
+                function (response: any) {
+                    // Retrieve Multiple Web API call completed successfully
+                    let count1: number = 0;
+                    let count2: number = 0;
+                    let count3: number = 0;
+
+                    // Loop through each returned record
+                    for (let entity of response.entities) {
+                        // Retrieve the value of _currencyAttributeName field
+                        let value: Number = entity[TSWebAPI._currencyAttributeName];
+
+                        // Check the value of _currencyAttributeName field and increment the correct counter
+                        if (value == 100) {
+                            count1++;
+                        }
+                        else if (value == 200) {
+                            count2++;
+                        }
+                        else if (value == 300) {
+                            count3++;
+                        }
+                    }
+
+                    // Generate HTML to inject into the fetch xml status div to showcase the results of the OData retrieve example
+                    let innerHtml: string = "Use above buttons to create or delete a record to see count update";
+                    innerHtml += "<br />";
+                    innerHtml += "<br />";
+                    innerHtml += "Count of " + TSWebAPI._entityName + " records with " + TSWebAPI._currencyAttributeName + " of 100: " + count1;
+                    innerHtml += "<br />";
+                    innerHtml += "Count of " + TSWebAPI._entityName + " records with " + TSWebAPI._currencyAttributeName + " of 200: " + count2;
+                    innerHtml += "<br />";
+                    innerHtml += "Count of " + TSWebAPI._entityName + " records with " + TSWebAPI._currencyAttributeName + " of 300: " + count3;
+
+                    // Inject the HTML into the fetch xml status div
+                    if (thisRef._odataStatusContainerDiv) {
+                        thisRef._odataStatusContainerDiv.innerHTML = innerHtml;
+                    }
+
+                    // Inject a success message into the result div
+                    thisRef.updateResultContainerText("Record count refreshed");
+                },
+                function (errorResponse: any) {
+                    // Error handling code here
+                    thisRef.updateResultContainerTextWithErrorResponse(errorResponse);
+                }
+            );
     }
 }
