@@ -80,6 +80,17 @@ export class TSWebAPI implements ComponentFramework.StandardControl<IInputs, IOu
 	public updateView(context: ComponentFramework.Context<IInputs>): void
 	{
 		// Add code to update control view
+		if (!this._controlViewRendered) {
+            this._controlViewRendered = true;
+
+            // Render Web API Examples
+            this.renderCreateExample();
+            this.renderDeleteExample();
+            this.renderFetchXmlRetrieveMultipleExample();
+            this.renderODataRetrieveMultipleExample();
+
+            // Render result div to display output of Web API calls
+            this.renderResultsDiv();
 	}
 
 	/** 
