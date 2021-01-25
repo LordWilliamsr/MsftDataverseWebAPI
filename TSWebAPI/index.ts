@@ -418,5 +418,112 @@ export class TSWebAPI implements ComponentFramework.StandardControl<IInputs, IOu
                     thisRef.updateResultContainerTextWithErrorResponse(errorResponse);
                 }
             );
+	}
+	
+
+	// Add the following helper methods to render the results of your CRUD operations within your component:
+	/** 
+     * Renders example use of CreateRecord Web API
+     */
+    private renderCreateExample() {
+        // Create header label for Web API sample
+        let headerDiv: HTMLDivElement = this.createHTMLDivElement("create_container", true, "Click to create "
+            + TSWebAPI._entityName + " record");
+        this._container.appendChild(headerDiv);
+
+        // Create button 1 to create a record with the revenue field set to 100
+        let value1: string = "100";
+        this._createEntity1Button = this.createHTMLButtonElement(
+            this.getCreateRecordButtonLabel(value1),
+            this.getCreateButtonId(value1),
+            value1,
+            this.createButtonOnClickHandler.bind(this));
+
+        // Create button 2 to create a record with the revenue field set to 200
+        let value2: string = "200";
+        this._createEntity2Button = this.createHTMLButtonElement(
+            this.getCreateRecordButtonLabel(value2),
+            this.getCreateButtonId(value2),
+            value2,
+            this.createButtonOnClickHandler.bind(this));
+
+        // Create button 3 to create a record with the revenue field set to 300
+        let value3: string = "300";
+        this._createEntity3Button = this.createHTMLButtonElement(
+            this.getCreateRecordButtonLabel(value3),
+            this.getCreateButtonId(value3),
+            value3,
+            this.createButtonOnClickHandler.bind(this));
+
+        // Append all button HTML elements to custom control container div
+        this._container.appendChild(this._createEntity1Button);
+        this._container.appendChild(this._createEntity2Button);
+        this._container.appendChild(this._createEntity3Button);
+    }
+
+    /** 
+     * Renders example use of DeleteRecord Web API
+     */
+    private renderDeleteExample(): void {
+        // Create header label for Web API sample
+        let headerDiv: HTMLDivElement = this.createHTMLDivElement("delete_container", true, "Click to delete " + TSWebAPI._entityName + " record");
+
+        // Render button to invoke DeleteRecord Web API call
+        this._deleteRecordButton = this.createHTMLButtonElement(
+            "Select record to delete",
+            "delete_button",
+            null,
+            this.deleteButtonOnClickHandler.bind(this));
+
+        // Append elements to custom control container div
+        this._container.appendChild(headerDiv);
+        this._container.appendChild(this._deleteRecordButton);
+    }
+
+    /** 
+     * Renders example use of RetrieveMultiple Web API with OData
+     */
+    private renderODataRetrieveMultipleExample(): void {
+        let containerClassName: string = "odata_status_container";
+
+        // Create header label for Web API sample
+        let statusDivHeader: HTMLDivElement = this.createHTMLDivElement(containerClassName, true, "Click to refresh record count");
+        this._odataStatusContainerDiv = this.createHTMLDivElement(containerClassName, false, undefined);
+
+        // Create button to invoke OData RetrieveMultiple Example
+        this._fetchXmlRefreshButton = this.createHTMLButtonElement(
+            "Refresh record count",
+            "odata_refresh",
+            null,
+            this.refreshRecordCountButtonOnClickHandler.bind(this));
+
+        // Append HTML elements to custom control container div
+        this._container.appendChild(statusDivHeader);
+        this._container.appendChild(this._odataStatusContainerDiv);
+        this._container.appendChild(this._fetchXmlRefreshButton);
+    }
+
+    /** 
+     * Renders example use of RetrieveMultiple Web API with Fetch XML
+     */
+    private renderFetchXmlRetrieveMultipleExample(): void {
+        let containerName: string = "fetchxml_status_container";
+
+        // Create header label for Web API sample
+        let statusDivHeader: HTMLDivElement = this.createHTMLDivElement(containerName, true,
+            "Click to calculate average value of " + TSWebAPI._currencyAttributeNameFriendlyName);
+        let statusDiv: HTMLDivElement = this.createHTMLDivElement(containerName, false, undefined);
+
+        // Create button to invoke Fetch XML RetrieveMultiple Web API example
+        this._oDataRefreshButton = this.createHTMLButtonElement(
+            "Calculate average value of " + TSWebAPI._currencyAttributeNameFriendlyName,
+            "odata_refresh",
+            null,
+            this.calculateAverageButtonOnClickHandler.bind(this));
+
+        // Append HTML Elements to custom control container div
+        this._container.appendChild(statusDivHeader);
+        this._container.appendChild(statusDiv);
+        this._container.appendChild(this._oDataRefreshButton);
     }
 }
