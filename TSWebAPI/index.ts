@@ -110,4 +110,107 @@ export class TSWebAPI implements ComponentFramework.StandardControl<IInputs, IOu
 	{
 		// Add code to cleanup control if necessary
 	}
+
+
+	// HELPER METHOD
+	/**
+     * Helper method to create HTML button that is used for CreateRecord Web API Example
+     * @param buttonLabel : Label for button
+     * @param buttonId : ID for button
+     * @param buttonValue : Value of button (attribute of button)
+     * @param onClickHandler : onClick event handler to invoke for the button
+     */
+    private createHTMLButtonElement(buttonLabel: string, buttonId: string, buttonValue: string | null, onClickHandler: (event?: any) => void): HTMLButtonElement {
+        let button: HTMLButtonElement = document.createElement("button");
+        button.innerHTML = buttonLabel;
+
+        if (buttonValue) {
+            button.setAttribute("buttonvalue", buttonValue);
+        }
+
+        button.id = buttonId;
+
+        button.classList.add("SampleControl_WebAPI_ButtonClass");
+        button.addEventListener("click", onClickHandler);
+        return button;
+    }
+
+    /**
+     * Helper method to create HTML Div Element
+     * @param elementClassName : Class name of div element
+     * @param isHeader : True if 'header' div - adds extra class and post-fix to ID for header elements
+     * @param innerText : innerText of Div Element
+     */
+    private createHTMLDivElement(elementClassName: string, isHeader: Boolean, innerText?: string): HTMLDivElement {
+        let div: HTMLDivElement = document.createElement("div");
+
+        if (isHeader) {
+            div.classList.add("SampleControl_WebAPI_Header");
+            elementClassName += "_header";
+        }
+
+        if (innerText) {
+            div.innerText = innerText.toUpperCase();
+        }
+
+        div.classList.add(elementClassName);
+        return div;
+    }
+
+    /** 
+     * Renders a 'result container' div element to inject the status of the example Web API calls 
+     */
+    private renderResultsDiv() {
+        // Render header label for result container
+        let resultDivHeader: HTMLDivElement = this.createHTMLDivElement("result_container", true,
+            "Result of last action");
+        this._container.appendChild(resultDivHeader);
+
+        // Div elements to populate with the result text
+        this._resultContainerDiv = this.createHTMLDivElement("result_container", false, undefined);
+        this._container.appendChild(this._resultContainerDiv);
+
+        // Init the result container with a notification that the control was loaded
+        this.updateResultContainerText("Web API sample custom control loaded");
+    }
+
+    /**
+     * Helper method to inject HTML into result container div
+     * @param statusHTML : HTML to inject into result container
+     */
+    private updateResultContainerText(statusHTML: string): void {
+        if (this._resultContainerDiv) {
+            this._resultContainerDiv.innerHTML = statusHTML;
+        }
+    }
+
+    /**
+     * Helper method to inject error string into result container div after failed Web API call
+     * @param errorResponse : error object from rejected promise
+     */
+    private updateResultContainerTextWithErrorResponse(errorResponse: any): void {
+        if (this._resultContainerDiv) {
+            // Retrieve the error message from the errorResponse and inject into the result div
+            let errorHTML: string = "Error with Web API call:";
+            errorHTML += "<br />"
+            errorHTML += errorResponse.message;
+            this._resultContainerDiv.innerHTML = errorHTML;
+        }
+    }
+
+    /**
+     * Helper method to generate Label for Create Buttons
+     * @param entityNumber : value to set _currencyAttributeNameFriendlyName field to for this button
+     */
+    private getCreateRecordButtonLabel(entityNumber: string): string {
+        return "Create record with " + TSWebAPI._currencyAttributeNameFriendlyName + " of " + entityNumber;
+    }
+
+    /**
+     * Helper method to generate ID for Create button
+     * @param entityNumber : value to set _currencyAttributeNameFriendlyName field to for this button
+     */
+    private getCreateButtonId(entityNumber: string): string {
+        return "create_button_" + entityNumber;
+    }
 }
