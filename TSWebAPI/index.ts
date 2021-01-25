@@ -1,7 +1,28 @@
 import {IInputs, IOutputs} from "./generated/ManifestTypes";
 
 export class TSWebAPI implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+	// Reference to the control container HTMLDivElement
+    // This element contains all elements of our custom control example
+    private _container: HTMLDivElement;
 
+    // Reference to ComponentFramework Context object
+    private _context: ComponentFramework.Context<IInputs>;
+
+    // Flag if control view has been rendered
+    private _controlViewRendered: Boolean;
+
+    // References to button elements that are rendered by example custom control
+    private _createEntity1Button: HTMLButtonElement;
+    private _createEntity2Button: HTMLButtonElement;
+    private _createEntity3Button: HTMLButtonElement;
+    private _deleteRecordButton: HTMLButtonElement;
+    private _fetchXmlRefreshButton: HTMLButtonElement;
+    private _oDataRefreshButton: HTMLButtonElement;
+
+    // References to div elements that are rendered by the example custom control
+    private _odataStatusContainerDiv: HTMLDivElement;
+	private _resultContainerDiv: HTMLDivElement;
+	
 	/**
 	 * Empty constructor.
 	 */
