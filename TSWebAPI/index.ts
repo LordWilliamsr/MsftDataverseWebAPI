@@ -1,6 +1,7 @@
 import {IInputs, IOutputs} from "./generated/ManifestTypes";
 
 export class TSWebAPI implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+	// Above the constructor method, insert the following private variables to support rendering of your component:
 	// Reference to the control container HTMLDivElement
     // This element contains all elements of our custom control example
     private _container: HTMLDivElement;
@@ -23,6 +24,28 @@ export class TSWebAPI implements ComponentFramework.StandardControl<IInputs, IOu
     private _odataStatusContainerDiv: HTMLDivElement;
 	private _resultContainerDiv: HTMLDivElement;
 	
+	/*
+		Add the following private static variables above the constructor to indicate which entity/fields you will be interfacing
+		with in this example. If you want to try against different entities or fields, you can do so by changing their respective values.
+	*/
+	// Name of entity to use for example Web API calls that are performed by this control
+    private static _entityName: string = "account";
+
+    // Required field on _entityName of type 'single line of text'
+    // Example Web API calls that are performed by the example custom control will set this field for new record creation examples
+    private static _requiredAttributeName: string = "name";
+
+    // Value that the _requiredAttributeName field will be set to for new created records
+    private static _requiredAttributeValue: string = "Web API Custom Control (Sample)";
+
+    // Name of currency field on _entityName to populate during record create
+    // Example Web API calls that are performed by the example custom control will set and read this field
+    private static _currencyAttributeName: string = "revenue";
+
+    // Friendly name of currency field (only used for control UI - no functional impact)
+    private static _currencyAttributeNameFriendlyName: string = "annual revenue";
+
+
 	/**
 	 * Empty constructor.
 	 */
