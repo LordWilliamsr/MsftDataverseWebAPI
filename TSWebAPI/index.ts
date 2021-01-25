@@ -99,7 +99,7 @@ export class TSWebAPI implements ComponentFramework.StandardControl<IInputs, IOu
 	 */
 	public getOutputs(): IOutputs
 	{
-		return {};
+		return { };
 	}
 
 	/** 
